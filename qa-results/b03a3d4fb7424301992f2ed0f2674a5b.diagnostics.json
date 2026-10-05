@@ -1,0 +1,13 @@
+{
+  "run_id": "b03a3d4fb7424301992f2ed0f2674a5b",
+  "warnings": {
+    "passed_tc_without_assertion_events_hook_or_cache_unconfirmed": 1
+  },
+  "tc_count": 1,
+  "visit_count": 1,
+  "snapshot_count": 11,
+  "check_count": 0,
+  "assertion_count": 0,
+  "source_count": 1,
+  "exported": true
+}
