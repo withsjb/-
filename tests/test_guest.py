@@ -1,6 +1,7 @@
 """기존 home_screen fixture를 사용하는 T 멤버십 테스트."""
 
 import pytest
+import time
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
@@ -62,11 +63,17 @@ def test_t_day_b(home_screen, tc_id):
     return_from_t_day(driver)
 
 
-@pytest.mark.parametrize("tc_id", [pytest.param("TC_GUEST_SEARCH_A", id="TC_GUEST_SEARCH_A")])
+@pytest.mark.parametrize(
+    "tc_id",
+    [pytest.param("TC_GUEST_SEARCH_A", id="TC_GUEST_SEARCH_A")],
+)
 def test_search_a(home_screen, tc_id):
     driver = home_screen
+
     click(driver, SEARCH_BUTTON)
+
     driver.back()
+
     menu = visible(driver, MENU_BUTTON)
     assert menu.is_displayed(), "검색 종료 후 전체메뉴 버튼이 보이지 않습니다."
 
