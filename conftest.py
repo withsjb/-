@@ -6,6 +6,8 @@ from selenium.webdriver.support import expected_conditions as EC
 import settings
 import locator
 
+pytest_plugins = ["qa_allure"]
+
 
 
 @pytest.fixture

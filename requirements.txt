@@ -1,3 +1,5 @@
 pytest>=8,<10
 Appium-Python-Client==3.2.1
 selenium==4.16.0
+allure-pytest==2.16.2
+./vendor/qa_blindspot_capture-0.4.7-py3-none-any.whl
