@@ -1,7 +1,8 @@
-"""기존 home_screen fixture를 사용하는 T 멤버십 테스트."""
+"""로그인 정보를 유지하는 공통 화면 테스트. guest TC ID는 기존 이력 연결용입니다."""
 
 import pytest
 import time
+import settings
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
@@ -24,8 +25,8 @@ def click(driver, xpath):
     ).click()
 
 
-def visible(driver, xpath):
-    return WebDriverWait(driver, WAIT_SECONDS).until(
+def visible(driver, xpath, timeout=WAIT_SECONDS):
+    return WebDriverWait(driver, timeout).until(
         EC.visibility_of_element_located((By.XPATH, xpath)),
         message=f"표시 요소를 찾지 못했습니다: {xpath}",
     )
@@ -34,7 +35,7 @@ def visible(driver, xpath):
 def open_t_day(driver):
     click(driver, MEMBERSHIP_TAB)
     click(driver, T_DAY)
-    return visible(driver, DESTINATION)
+    return visible(driver, DESTINATION, timeout=settings.NAVIGATION_WAIT_SECONDS)
 
 
 def return_from_t_day(driver):

@@ -6,3 +6,11 @@ from appium.webdriver.common.appiumby import AppiumBy
 HOME_LOGO = (AppiumBy.ID, "com.tms:id/mLogoImage")
 MENU_OPEN = (AppiumBy.ID, "com.tms:id/mMenuButton")
 MENU_CLOSE = (AppiumBy.ID, "com.tms:id/mLoginClose")
+
+# 공통 메인의 준비·로그인 표시 확인용. 화면에 표시된 상태만 읽습니다.
+MEMBERSHIP_TAB = (AppiumBy.XPATH, '//android.widget.LinearLayout[@content-desc="T 멤버십"]')
+T_DAY = (AppiumBy.XPATH, '//android.view.View[@content-desc="T day"]')
+HOME_SEARCH = (AppiumBy.XPATH, '//android.widget.ImageView[@content-desc="통합검색"]')
+LOADING_INDICATOR = (AppiumBy.CLASS_NAME, 'android.widget.ProgressBar')
+USER_INFO = (AppiumBy.ID, 'com.tms:id/mUserInfoText')
+POINT_INFO = (AppiumBy.ID, 'com.tms:id/mPointInfoContainer')

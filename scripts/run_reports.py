@@ -13,7 +13,7 @@ def main():
     parser.add_argument('--prepare-log',action='store_true',help='Create only the selected observation log, without running pytest')
     args,pytest_args=parser.parse_known_args()
     if pytest_args[:1]==['--']:pytest_args=pytest_args[1:]
-    if any(x.split('=')[0] in ('--alluredir','--clean-alluredir','--qa-observation-log','-o','--override-ini') for x in pytest_args):
+    if any(x.split('=')[0] in ('--alluredir','--clean-alluredir','--qa-observation-log','--qa-capture-tc-csv','-o','--override-ini') for x in pytest_args):
         parser.error('Result paths and ini overrides are managed by this script. Run pytest directly for custom paths.')
     tc=args.tc_csv.expanduser().resolve() if args.tc_csv else None
     if tc and (not tc.is_file() or tc.suffix.lower()!='.csv'):parser.error('--tc-csv must reference an existing CSV')
@@ -26,9 +26,15 @@ def main():
     stamp=datetime.now().strftime('%Y%m%d-%H%M%S')+'-'+uuid.uuid4().hex[:8]
     folder=ROOT/'test-artifacts'/stamp;results=folder/'allure-results';results.mkdir(parents=True)
     log_path=live or folder/'observation.log';log_path.parent.mkdir(parents=True,exist_ok=True);log_path.touch(exist_ok=True)
+    if tc:
+        # Snapshot the selected specification before execution for both ZIP formats.
+        with tc.open('rb') as stream: spec_bytes=stream.read(1_000_001)
+        if len(spec_bytes)>1_000_000:parser.error('--tc-csv must be at most 1 MB')
+        spec_path=folder/'test_cases.csv';spec_path.write_bytes(spec_bytes)
     command=[sys.executable,'-m','pytest','-vv','--capture=tee-sys',
         '--alluredir',str(results),'--qa-observation-log',str(log_path),
-        '-o','qa_capture_output='+str((folder/'qa-results').relative_to(ROOT)),*pytest_args]
+        '-o','qa_capture_output='+str((folder/'qa-results').relative_to(ROOT)),
+        *(['--qa-capture-tc-csv',str(spec_path.relative_to(ROOT))] if tc else []),*pytest_args]
     print('RESULT_DIR',folder,flush=True)
     with (folder/'pytest.log').open('w',encoding='utf8') as log:
         process=subprocess.Popen(command,cwd=ROOT,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,
@@ -39,7 +45,7 @@ def main():
         except KeyboardInterrupt:
             if process.poll() is None:process.terminate()
             code=process.wait()
-    if tc:shutil.copy2(tc,results/'test_cases.csv')
+    if tc:shutil.copy2(spec_path,results/'test_cases.csv')
     archive=shutil.make_archive(str(folder/'allure-results'),'zip',root_dir=results)
     summary={'exit_code':code,'command':command,'allure_results':str(results),
         'allure_zip':archive,'qa_zips':[str(p) for p in (folder/'qa-results').glob('*.zip')],

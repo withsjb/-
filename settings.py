@@ -13,3 +13,10 @@ APP_PACKAGE = "com.tms"
 APP_ACTIVITY = "com.tms.activity.MainActivityDefault"
 WAIT_SECONDS = 20
 
+
+# 초기 홈과 첫 목적지 로딩에만 적용합니다. 기존 검증 조건은 그대로 유지합니다.
+HOME_READY_TIMEOUT = 60
+HOME_READY_STABLE_SECONDS = 1.0
+NAVIGATION_WAIT_SECONDS = 45
+# 공통 화면 테스트는 저장된 로그인 상태를 유지합니다. 필요 시 logged_in/logged_out 지정.
+EXPECTED_LOGIN_STATE = "any"

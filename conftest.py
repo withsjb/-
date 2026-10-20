@@ -1,10 +1,10 @@
 import pytest
 from appium import webdriver
 from appium.options.android import UiAutomator2Options
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 import settings
-import locator
+from ui_readiness import wait_home, check_authentication
+import json
+import allure
 
 pytest_plugins = ["qa_allure"]
 
@@ -25,6 +25,7 @@ def driver():
         "appium:appActivity": settings.APP_ACTIVITY,
         "appium:noReset": True,
         "appium:newCommandTimeout": 120,
+        "appium:uiautomator2ServerInstallTimeout": 120000,
     })
     app = webdriver.Remote(settings.APPIUM_URL, options=options)
     try:
@@ -39,11 +40,15 @@ def driver():
 
 
 @pytest.fixture
-def home_screen(driver):
-    """첫 안내/로그인 팝업이 있다면 기존 처리 코드를 이 대기 앞에 추가하세요."""
-    WebDriverWait(driver, settings.WAIT_SECONDS).until(
-        EC.visibility_of_element_located(locator.HOME_LOGO),
-        message="메인 로고가 보이지 않습니다. 초기 팝업/현재 화면/로케이터를 확인하세요.",
-    )
+def home_screen(driver, record_property):
+    """공통 메인의 준비 상태와 화면 로그인 표시를 확인하며 앱 데이터는 유지합니다."""
+    wait_home(driver, settings.HOME_READY_TIMEOUT, settings.HOME_READY_STABLE_SECONDS)
+    state = check_authentication(driver, settings.EXPECTED_LOGIN_STATE)
+    record_property('qa_auth_state', state)
+    record_property('qa_auth_policy', 'preserve')
+    record = {'state': state, 'basis': 'home_ui_indicators', 'policy': 'preserve',
+              'expected': settings.EXPECTED_LOGIN_STATE}
+    # 상태 코드만 보관합니다. 이름·포인트·인증 정보는 이 기록에 넣지 않습니다.
+    allure.attach(json.dumps(record, ensure_ascii=False), name='로그인 준비 상태',
+                  attachment_type=allure.attachment_type.JSON)
     return driver
-
